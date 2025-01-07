@@ -3,19 +3,21 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-console.log('Supabase URL:', supabaseUrl);
-console.log('Supabase Key exists:', !!supabaseKey);
+console.log('Initializing Supabase client with:');
+console.log('- URL:', supabaseUrl ? 'Present' : 'Missing');
+console.log('- Key:', supabaseKey ? 'Present' : 'Missing');
 
-// Provide default values for development to prevent crashes
-const defaultUrl = 'https://your-project.supabase.co';
-const defaultKey = 'your-anon-key';
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Supabase environment variables are missing. Please check your .env file and ensure it contains:');
+  console.error('VITE_SUPABASE_URL=your_project_url');
+  console.error('VITE_SUPABASE_ANON_KEY=your_anon_key');
+}
 
 export const supabase = createClient(
-  supabaseUrl || defaultUrl,
-  supabaseKey || defaultKey
+  supabaseUrl || '',
+  supabaseKey || ''
 );
 
-// Export a helper function to check if credentials are properly configured
 export const isSupabaseConfigured = () => {
   return !!supabaseUrl && !!supabaseKey;
 };
