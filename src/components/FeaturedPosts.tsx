@@ -1,44 +1,58 @@
 import { Card } from "./ui/card";
-
-interface Post {
-  id: number;
-  title: string;
-  excerpt: string;
-  category: string;
-  image: string;
-}
-
-const featuredPosts: Post[] = [
-  {
-    id: 1,
-    title: "The Ultimate Smart Home Setup Guide 2024",
-    excerpt: "Everything you need to know about creating your perfect smart home ecosystem.",
-    category: "Guides",
-    image: "https://images.unsplash.com/photo-1558002038-1055907df827?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    id: 2,
-    title: "Top 10 Smart Thermostats Compared",
-    excerpt: "An in-depth comparison of the best smart thermostats available today.",
-    category: "Reviews",
-    image: "https://images.unsplash.com/photo-1585435421671-0c16764628ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    id: 3,
-    title: "Home Security: Smart Cameras Guide",
-    excerpt: "Protect your home with the latest in smart security technology.",
-    category: "Security",
-    image: "https://images.unsplash.com/photo-1557324232-b8917d3c3dcb?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { BlogPost } from "@/types/blog";
+import { toast } from "sonner";
 
 export const FeaturedPosts = () => {
+  const { data: posts, isLoading } = useQuery({
+    queryKey: ['featuredPosts'],
+    queryFn: async () => {
+      console.log("Fetching featured posts");
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3);
+      
+      if (error) {
+        console.error("Error fetching featured posts:", error);
+        toast.error("Failed to load featured posts");
+        throw error;
+      }
+      
+      return data as BlogPost[];
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <section className="py-16 bg-secondary/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-primary mb-8">Featured Articles</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-200"></div>
+                <div className="p-6">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 bg-secondary/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-primary mb-8">Featured Articles</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredPosts.map((post) => (
+          {posts?.map((post) => (
             <Card
               key={post.id}
               className="overflow-hidden hover:shadow-lg transition-shadow duration-300"
