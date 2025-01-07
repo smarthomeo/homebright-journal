@@ -1,6 +1,6 @@
 import { Card } from "./ui/card";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { BlogPost } from "@/types/blog";
 import { toast } from "sonner";
 
@@ -9,6 +9,13 @@ export const FeaturedPosts = () => {
     queryKey: ['featuredPosts'],
     queryFn: async () => {
       console.log("Fetching featured posts");
+      
+      if (!isSupabaseConfigured()) {
+        console.warn("Supabase is not configured. Please set up your environment variables.");
+        toast.error("Supabase configuration is missing. Please check your environment variables.");
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('posts')
         .select('*')
