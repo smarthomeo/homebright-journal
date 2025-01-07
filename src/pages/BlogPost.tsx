@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { BlogPost as BlogPostType } from "@/types/blog";
 import { toast } from "sonner";
 
@@ -13,13 +13,6 @@ const BlogPost = () => {
     queryKey: ['blog', id],
     queryFn: async () => {
       console.log("Fetching blog post with ID:", id);
-      
-      if (!isSupabaseConfigured()) {
-        console.error("Supabase is not configured. Please set up your environment variables.");
-        toast.error("Database configuration is missing. Please check environment variables.");
-        throw new Error("Supabase configuration missing");
-      }
-
       const { data, error } = await supabase
         .from('posts')
         .select('*')
@@ -35,23 +28,6 @@ const BlogPost = () => {
       return data as BlogPostType;
     },
   });
-
-  if (!isSupabaseConfigured()) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Navigation />
-        <main className="max-w-4xl mx-auto px-4 py-16">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600">Configuration Error</h1>
-            <p className="mt-2 text-gray-600">
-              Database configuration is missing. Please check your environment variables.
-            </p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (
