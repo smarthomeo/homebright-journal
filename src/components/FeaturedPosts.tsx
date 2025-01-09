@@ -17,8 +17,9 @@ export const FeaturedPosts = () => {
       }
 
       const { data, error } = await supabase
-        .from('posts')
+        .from('articles')
         .select('*')
+        .eq('published', true)
         .order('created_at', { ascending: false })
         .limit(3);
       
@@ -66,7 +67,7 @@ export const FeaturedPosts = () => {
             >
               <div className="relative h-48">
                 <img
-                  src={post.image}
+                  src={post.image || '/placeholder.svg'}
                   alt={post.title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
