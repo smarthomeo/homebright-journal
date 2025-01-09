@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { Menu, X, Search } from "lucide-react";
+import { Menu, X, Search, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
 
   return (
     <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
@@ -28,6 +36,9 @@ export const Navigation = () => {
             </a>
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleSignOut}>
+              <LogOut className="h-5 w-5" />
             </Button>
           </div>
 
@@ -67,6 +78,14 @@ export const Navigation = () => {
             >
               Tutorials
             </a>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={handleSignOut}
+            >
+              <LogOut className="h-5 w-5 mr-2" />
+              Sign out
+            </Button>
           </div>
         </div>
       )}
